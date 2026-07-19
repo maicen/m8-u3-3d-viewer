@@ -76,6 +76,11 @@
     <div class="top-bar">
         <label for="model-select"><strong>Select a Model:</strong></label>
         <select id="model-select"></select>
+        <div style="margin-right: auto; font-size: 14px; color: #555;">
+            Supported formats: <strong>GLB</strong>, <strong>SPZ</strong>, <strong>PLY</strong></div>
+        <div style="margin-left: auto; font-size: 14px; color: #555;">
+            Full-Screen 3D Model Viewer - Group 5 - MAICEN - 1125 - <a
+                href="https://github.com/maicen/m8-u3-3d-viewer">Assignment M8U3</a></div>
     </div>
 
     <div class="viewer-container">
@@ -93,11 +98,9 @@
 
         // Update the array to match your exact directory tree
         const filesInFolder = [
-            "apartment_model.glb",
-            "splat-trained.spz",
             "splat-trained-compressed.ply",
-            "splat-trained.ply",
-            "splat-trained.sog"
+            "apartment_model.glb"
+
         ];
 
         const folderPath = "final_models/";
