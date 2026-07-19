@@ -1,5 +1,5 @@
 
-## Full-Screen 3D Model Viewer
+# Full-Screen 3D Model Viewer
 
 An ultra-lightweight, cross-platform viewer for `.glb` models and Gaussian splats in `.ply` or `.spz` format. The current page uses a selector to switch between a GLB preview and a splat viewer, powered by Google's [`<model-viewer>`](https://modelviewer.dev/) and GaussianSplats3D.
 
@@ -33,19 +33,29 @@ live preview at <https://maicen.github.io/m8-u3-3d-viewer/>
 
 ## Software Used
 
-### Polycam
+### First Model
+
+Model: `final_models\apartment_model.glb`
+
+#### Polycam
 
 Polycam for iOS 6.0.14 (cdce00217) was used for live scanning and mesh generation of a residential apartment, exported as USDZ.
 
-### Blender
+#### Blender
 
 Used to convert the USDZ file to GLB for wider compatibility.
 
-### Agisoft Metashape
+### Second Model
+
+Model: `final_models\splat-trained-compressed.ply`
+
+A [room dataset](https://arxiv.org/abs/2111.12077) of 311 was used to generate COLMAP then Splats.
+
+#### Agisoft Metashape
 
 Used to generate COLMAP data for splat training.
 
-### 3D Splat App
+#### 3D Splat App
 
 Used for splat training and export of the compressed PLY file.
 
