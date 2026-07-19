@@ -1,0 +1,11 @@
+
+## dataset
+http://storage.googleapis.com/gresearch/refraw360/360_v2.zip
+
+@article{barron2022mipnerf360,
+    title={Mip-NeRF 360: Unbounded Anti-Aliased Neural Radiance Fields},
+    author={Jonathan T. Barron and Ben Mildenhall and 
+            Dor Verbin and Pratul P. Srinivasan and Peter Hedman},
+    journal={CVPR},
+    year={2022}
+}
