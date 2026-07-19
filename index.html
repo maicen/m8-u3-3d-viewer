@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic GLB, SPZ & PLY Viewer</title>
+
+    <!-- 1. Import Google's model-viewer for GLB files -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
+    <!-- 2. Set up an Import Map for Three.js and GaussianSplats3D -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+                "@mkkellogg/gaussian-splats-3d": "https://unpkg.com/@mkkellogg/gaussian-splats-3d/build/gaussian-splats-3d.module.js"
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+        }
+
+        .top-bar {
+            padding: 15px 20px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        select {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .viewer-container {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        /* Both viewers are hidden by default */
+        model-viewer,
+        #splat-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            overflow: hidden;
+        }
+
+        /* The active class makes the correct viewer visible */
+        .active {
+            display: block !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <label for="model-select"><strong>Select a Model:</strong></label>
+        <select id="model-select"></select>
+    </div>
+
+    <div class="viewer-container">
+        <!-- The GLB Viewer -->
+        <model-viewer id="glb-viewer" ar camera-controls></model-viewer>
+
+        <!-- The Splat Viewer Container (for SPZ & PLY) -->
+        <div id="splat-container"></div>
+    </div>
+
+    <!-- 3. Main Script Block -->
+    <script type="module">
+        // Import the Splat library
+        import * as GaussianSplats3D from '@mkkellogg/gaussian-splats-3d';
+
+        // Update the array to match your exact directory tree
+        const filesInFolder = [
+            "apartment_model.glb",
+            "splat-trained.spz",
+            "splat-trained-compressed.ply",
+            "splat-trained.ply",
+            "splat-trained.sog"
+        ];
+
+        const folderPath = "final_models/";
+
+        // Grab UI elements
+        const selectEl = document.getElementById('model-select');
+        const glbViewer = document.getElementById('glb-viewer');
+        const splatContainer = document.getElementById('splat-container');
+
+        let splatViewer = null;
+
+        // Populate dropdown
+        filesInFolder.forEach(file => {
+            const option = document.createElement('option');
+            option.value = file;
+            option.textContent = file;
+            selectEl.appendChild(option);
+        });
+
+        // Routing logic
+        function loadSelectedModel() {
+            const selectedFile = selectEl.value;
+            const fullPath = folderPath + selectedFile;
+            const ext = selectedFile.split('.').pop().toLowerCase();
+
+            // Hide both viewers initially
+            glbViewer.classList.remove('active');
+            splatContainer.classList.remove('active');
+
+            if (ext === 'glb') {
+                glbViewer.src = fullPath;
+                glbViewer.classList.add('active');
+            }
+            else if (ext === 'spz' || ext === 'ply') {
+                splatContainer.classList.add('active');
+
+                // Clean up the previous splat viewer if switching between splats
+                if (splatViewer) {
+                    if (typeof splatViewer.dispose === 'function') {
+                        splatViewer.dispose();
+                    }
+                    splatContainer.innerHTML = '';
+                }
+
+                // Initialize a new Splat Viewer instance
+                splatViewer = new GaussianSplats3D.Viewer({
+                    'rootElement': splatContainer,
+                    'cameraUp': [0, 1, 0],
+                    'initialCameraPosition': [0, 1, 5],
+                    'initialCameraLookAt': [0, 0, 0],
+                    'sharedMemoryForWorkers': false  // <-- Add this line to fix the crash
+                });
+
+                // Load the file natively (.spz or .ply)
+                splatViewer.addSplatScene(fullPath, {
+                    'progressiveLoad': true
+                }).then(() => {
+                    splatViewer.start();
+                }).catch(err => {
+                    console.error("Error loading splat:", err);
+                });
+            }
+            else if (ext === 'sog') {
+                // SOG requires the PlayCanvas engine
+                alert("The .sog format requires the PlayCanvas engine. Please select the GLB, SPZ, or PLY files instead.");
+            }
+        }
+
+        // Listen for user changes
+        selectEl.addEventListener('change', loadSelectedModel);
+
+        // Load the first model on startup
+        if (filesInFolder.length > 0) {
+            loadSelectedModel();
+        }
+    </script>
+
+</body>
+
+</html>
