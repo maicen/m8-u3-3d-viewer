@@ -1,33 +1,61 @@
 
 ## Full-Screen 3D Model Viewer
 
-An ultra-lightweight, cross-platform, full-screen 3D model viewer designed to showcase `.glb` or `.gltf` assets seamlessly in any browser. Built using Google's [`<model-viewer>`](https://modelviewer.dev/) component, it includes responsive overlay controls, interactive camera options, and fluid performance optimizations out of the box.
+An ultra-lightweight, cross-platform viewer for `.glb` models and Gaussian splats in `.ply` or `.spz` format. The current page uses a selector to switch between a GLB preview and a splat viewer, powered by Google's [`<model-viewer>`](https://modelviewer.dev/) and GaussianSplats3D.
+
+live preview at <https://maicen.github.io/m8-u3-3d-viewer/>
 
 ## Features
 
 - True full-screen layout with custom resets to prevent scrolling margins or clipping.
+- Model selector that switches between GLB and splat assets.
 - Custom overlay controls using a glassmorphic floating panel.
-- Interactive cameras for front view, top view, and automatic spin.
+- Interactive camera controls for the GLB viewer.
 - Super lightweight, with no bulky framework dependencies.
 - Deployment-ready for simple static servers such as Rust-based servers, Node utilities, or Python.
 
 ## Project Structure
 
 ```text
-├── index.html          # Main HTML document with custom CSS and JS controls
-└── 1447_03_26.glb      # Your 3D model asset (glTF Binary format)
+├── .vscode/
+├── final_models/
+│   ├── apartment_model.glb
+│   └── splat-trained-compressed.ply
+├── index.html
+├── room_colmap/
+│   ├── images/
+│   └── sparse/
+│       └── 0/
+└── workflow/
+    ├── 3d_splat_app/
+    └── metashape/
 ```
+
+## Software Used
+
+### Polycam
+
+Polycam for iOS 6.0.14 (cdce00217) was used for live scanning and mesh generation of a residential apartment, exported as USDZ.
+
+### Blender
+
+Used to convert the USDZ file to GLB for wider compatibility.
+
+### Agisoft Metashape
+
+Used to generate COLMAP data for splat training.
+
+### 3D Splat App
+
+Used for splat training and export of the compressed PLY file.
 
 ## Quick Start
 
 ### 1. Set Up Your Files
 
-Put your 3D model in the project folder, either as `1447_03_26.glb` or with whatever filename you reference in `index.html`.
+The viewer loads its assets from `final_models/` through the selector in `index.html`. The bundled files are `apartment_model.glb` and `splat-trained-compressed.ply`, and the code is ready to include more entries if you add them.
 
-```html
-<model-viewer id="my-viewer" src="1447_03_26.glb" alt="A 3D model" ar camera-controls>
-</model-viewer>
-```
+If you replace or rename a model, update the `filesInFolder` array and `folderPath` in `index.html` so the dropdown points at the new files.
 
 ### 2. Run a Local Server
 
@@ -54,36 +82,21 @@ npx http-server -p 8080
 python -m http.server 8080
 ```
 
+#### Option D: VS Code Live Server Extension
+
+If you use VS Code, install the Live Server extension and open `index.html` with it to launch a local preview with live reload.
+
 Open <http://localhost:8080> in your browser to view your model.
 
 ## Extensibility and Custom APIs
 
 The control layout uses the `<model-viewer>` JavaScript API. You can extend the functionality inside a `<script>` tag.
 
-### Dynamic Camera Control
-
-```js
-viewer.cameraOrbit = "45deg 55deg 2m";
-```
-
-### Animation Triggers
-
-```js
-viewer.animationName = "Walk";
-viewer.play();
-viewer.pause();
-```
-
-### Dynamic Material Swap
-
-```js
-viewer.variantName = "MidnightBlue";
-```
-
 ## MIME Type Support
 
-If your server fails to load the 3D asset, ensure it serves `.glb` files with the correct MIME type:
+If your server fails to load an asset, make sure it serves the files as static binary content and does not rewrite or text-encode them.
 
-- MIME type: `model/gltf-binary`
+- `.glb`: `model/gltf-binary`
+- `.ply` and `.spz`: regular binary/static file responses are usually sufficient
 
 All default servers suggested above support this out of the box.
